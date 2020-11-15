@@ -1,0 +1,20 @@
+
+
+.ARCHIVE
+*.NEW
+*.SAVE
+
+cloudbuild*
+env
+*.wio
+**/secrets
+.idea
+**/__pycache__
+**/.DS_Store
+*swp
+lib/
+**/*.pyc
+
+
+# ignoring all go stuff for now
+go
