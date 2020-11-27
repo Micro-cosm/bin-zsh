@@ -3,11 +3,11 @@
 
 printf "%s%b"									"${grey}"  "\n\t"
 printf "=%.0s"									{16..116}
-printf "\n\t==  DEPLOY \n\t"
+printf "\n\t= DEPLOY \n\t"
 printf "=%.0s"									{16..116}
 printf "%s%b"									"${grey}"  "\n${two_in}"
 printf '=%.0s'									{16..108}
-printf "%b==  DEPLOY:  Confirm environment%b"	"\n${two_in}"  "\n${two_in}"
+printf "%b= DEPLOY:  Confirm environment%b"	"\n${two_in}"  "\n${two_in}"
 printf "=%.0s"									{16..108}
 printf "%bDeploy configuration:"				"\n${three_in}"
 printf "%bCurrent directory ......%s √ %s%s"	"\n${four_in}"  "${g}"  "${reset}"  "${PWD}"
@@ -19,7 +19,7 @@ if [[ "${target}" == "REMOTE" ]]; then
 	printf "%bRemote specifics:"			"\n${three_in}"
 	printf "%bProject ID.............."		"\n${four_in}"
 	if [[ ${cloud_project_id} != "" ]]; then
-		printf "%s √ %s%s"						"${g}"  "${reset}"  "${cloud_project_id}"
+		printf "%s √ %s%s"								"${g}"  "${reset}"  "${cloud_project_id}"
 		printf "%bBuild file..............%s √ %s"		"\n${four_in}"  "${g}"  "${reset}"
 		printf "%bgcloud profile..........%s √ %s%s%b"	"\n${four_in}"  "${g}"  "${reset}"  "${cloud_project_id}"  "${two_down}"
 	else
@@ -33,7 +33,7 @@ if [[ "${target}" == "LOCAL" ]]; then
 
 	printf "%s%b"									"${grey}"  "\n${two_in}"
 	printf '=%.0s'									{16..108}
-	printf "%b==  DEPLOY:  Pull image%b"			"\n${two_in}"  "\n${two_in}"
+	printf "%b= DEPLOY:  Pull image%b"			"\n${two_in}"  "\n${two_in}"
 	printf '=%.0s'									{16..108}
 	printf "%bPull from registry:  %s/%s/%s:%s"		"\n${three_in}" "${cloud_project_id}" "${service_name}" "${target_prefix}" "${image_tag}"
 
@@ -53,7 +53,7 @@ if [[ "${target}" == "LOCAL" ]]; then
 
 	printf "%s%b"									"${grey}"  "\n${two_in}"
 	printf '=%.0s'									{16..108}
-	printf "%b==  DEPLOY:  Stop container(s)%b"		"\n${two_in}"  "\n${two_in}"
+	printf "%b= DEPLOY:  Stop container(s)%b"		"\n${two_in}"  "\n${two_in}"
 	printf '=%.0s'									{16..108}
 
 	printf "%s%bSTOPPING CONTAINERS...%b%s"			"${y}"  "${two_down}${three_in}"  "${two_down}"  "${reset}"
@@ -66,7 +66,7 @@ if [[ "${target}" == "LOCAL" ]]; then
 
 	printf "%s%b"									"${grey}"  "\n${two_in}"
 	printf '=%.0s'									{16..108}
-	printf "%b==  DEPLOY:  Start container(s)%b" 	"\n${two_in}"  "\n${two_in}"
+	printf "%b= DEPLOY:  Start container(s)%b" 	"\n${two_in}"  "\n${two_in}"
 	printf '=%.0s'									{16..108}
 
 	printf "%s%bSTARTING CONTAINERS...%b%s"			"${y}"  "${two_down}${three_in}"  "${two_down}"  "${reset}"
@@ -80,24 +80,27 @@ else
 
 	printf "%s%b"									"${grey}"  "\n${two_in}"
 	printf "=%.0s"									{16..108}
-	printf "%b==  DEPLOY:  Start container(s)%b"	"\n${two_in}"  "\n${two_in}"
+	printf "%b= DEPLOY:  Start container(s)%b"		"\n${two_in}"  "\n${two_in}"
 	printf "=%.0s"									{16..108}
 	printf "%s"										"${reset}"
-	printf "%bCloud project(actual).....%s √ %s%s"	"\n${three_in}" "${g}" "${reset}" "${cloud_project_id_actual}"
+	printf "%bCloud project(actual).....%s √ %s"	"\n${three_in}" "${g}" "${reset}${cloud_project_id_actual}"
 	printf "%bCloud project(requested).."			"\n${three_in}"
 
 	if [[ "${cloud_project_id}" == "${cloud_project_id_actual}" ]]; then
-		printf "%s √ %s%s"							"${g}" "${reset}" "${cloud_project_id}"
-	else
-		printf "%s X %s %s"							"${r}" "${reset}" "${cloud_project_id}"
-		printf "%bConfirm settings. Quitting..."	"${two_down}"
 
+		printf "%s √ %s%s"							"${g}" "${reset}" "${cloud_project_id}"
+
+	else
+
+		printf "%s X >%s< Confirm your gcloud project config, quitting..."	"${r}"  "${reset}${cloud_project_id}"
 		exit 8
+
 	fi
-	printf "%bCloud region (actual).....%s √ %s%s"	"\n${three_in}"  "${g}"  "${reset}"  "${cloud_region_actual}"
-	printf "%bCloud target..............%s √ %s%s"	"\n${three_in}"  "${g}"  "${reset}"  "${target}"
-	printf "%bCloud service name........%s √ %s%s"	"\n${three_in}"  "${g}"  "${reset}"  "${service_name}"
-	printf "%b'cloudbuild.json'?........"			"\n${three_in}"
+
+	printf "%bCloud region (actual).....%s √ %s%s"		"\n${three_in}"  "${g}"  "${reset}"  "${cloud_region_actual}"
+	printf "%bCloud target..............%s √ %s%s"		"\n${three_in}"  "${g}"  "${reset}"  "${target}"
+	printf "%bCloud service name........%s √ %s%s"		"\n${three_in}"  "${g}"  "${reset}"  "${service_name}"
+	printf "%b'cloudbuild.json'?........"				"\n${three_in}"
 
 	cb_service=cloudbuild.${service_name}.${target_domain}.${target_prefix}.json
 	cb_domain=cloudbuild.${target_domain}.${target_prefix}.json
@@ -107,21 +110,21 @@ else
 	if [[ -e "${cb_service}" ]]; then
 		deploy_pipeline="${cb_service}"
 		printf "%s X %soverride found!"		"${r}"  "${reset}"
-		printf "%b%s √ %s%s"				"\n${six_in}"  "${g}"  "${reset}"  "${deploy_pipeline}"
+		printf "%b  %s √ %s%s"				"\n${six_in}"  "${g}"  "${reset}"  "${deploy_pipeline}"
 		printf "%s%b"						"${y}"  "${two_down}"
 		cat "${deploy_pipeline}"
 		printf "%b%s"						"${two_down}"  "${reset}"
 	elif [[ -e "${cb_domain}" ]]; then
 		deploy_pipeline="${cb_domain}"
 		printf "%s X %soverride found!"		"${r}"  "${reset}"
-		printf "%b%s √ %s%s"				"\n${six_in}"  "${g}"  "${reset}"  "${deploy_pipeline}"
+		printf "%b  %s √ %s%s"				"\n${six_in}"  "${g}"  "${reset}"  "${deploy_pipeline}"
 		printf "%s%b"						"${y}"  "${two_down}"
 		cat "${deploy_pipeline}"
 		printf "%b%s"						"${two_down}" "${reset}"
 	elif [[ -e "${cb_target}" ]]; then
 		deploy_pipeline="${cb_target}"
 		printf "%s X %soverride found!"		"${r}"  "${reset}"
-		printf "%b%s √ %s%s"				"\n${six_in}"  "${g}"  "${reset}"  "${deploy_pipeline}"
+		printf "%b  %s √ %s%s"				"\n${six_in}"  "${g}"  "${reset}"  "${deploy_pipeline}"
 		printf "%s%b"						"${y}"  "${two_down}"
 		cat "${deploy_pipeline}"
 		printf "%s%b"						"${reset}"  "${two_down}"

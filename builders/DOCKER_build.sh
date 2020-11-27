@@ -2,19 +2,18 @@
 
 manifest='docker-compose.yml';
 
-printf "%bBuild requested for:\t%s%s%s"  			"\n${three_in}"  "${g}"  "${target_prefix}"  "${reset}"
-printf "%bLooking for '%s'......"        			"\n${four_in}"  "${manifest}"
+printf "%bBuild requested:%b%s" "\n${three_in}"  "${four_in}"  "${g}${target_prefix}${reset}"
+printf "%bLooking for '%s'......"	"\n${four_in}"  "${manifest}"
 
 
 if [[ -e "${manifest}" ]]; then
-	printf "%s √ %s \t found!"  					"${g}"  "${reset}"
+	printf "%s √ %sfound!"  				"${g}"  "${reset}"
 else
-	printf "%s X %s\t NOT FOUND!  Quitting.../n/n"  "${r}"  "${reset}"
-	printf "/n/n"
+	printf "%s X %sNOT FOUND, quitting%b"	"${r}"  "${reset}"  "${three_down}"
 	exit 2
 fi
 
-printf "%s%bSTARTING DOCKER BUILD...%b%s"			"${y}"  "${two_down}${three_in}"  "${two_down}"  "${reset}"
+printf "%s%bSTARTING DOCKER BUILD...%b%s"	"${y}"  "${two_down}${three_in}"  "${two_down}"  "${reset}"
 
 if ! docker-compose build	--no-cache											\
 							--progress auto										\
@@ -22,9 +21,9 @@ if ! docker-compose build	--no-cache											\
 							--build-arg CLOUD_PROJECT_ID="${cloud_project_id}"	\
 							--build-arg TARGET_PREFIX="${target_prefix}"		\
 							--build-arg SERVICE_NAME="${service_name}"			\
-							--build-arg TARGET_DOMAIN="${target_domain}"		\
 							--build-arg IMAGE_TAG="${image_tag}"				\
-							--build-arg LOG_LEVEL="${log_level}"				\
+#							--build-arg TARGET_DOMAIN="${target_domain}"		\
+#							--build-arg LOG_LEVEL="${log_level}"				\
 							"${service_name}"									\
 ; then
 	printf "%s%b"										"${r}"  "${two_down}\t"

@@ -2,20 +2,20 @@
 
 
 	printf "\n\n\t %s=========================================================================================="		"${b}"
-	printf "  \n\t ==  Prepare %s deployment"																			"${target_type}"
+	printf "  \n\t = Prepare %s deployment"																			"${target_type}"
 	printf "  \n\t ==========================================================================================%s"		"${reset}"
-	printf "%bBuild requested for:\t%s%s%s"       "\n${three_in}"  "${g}"  "${target_prefix}"  "${reset}"
-	printf "\n\n\t\t Looking for '%s'......"																			"${manifest}"
+	printf "%bBuild requested:%b%s"		"\n${three_in}"  "${four_in}"  "${g}${target_prefix}${reset}"
+	printf "%bLooking for '%s'......"	"${two_down}${two_in}"  "${manifest}"
 
 	if [[ -e "${manifest}" ]]; then
-		printf "%s √ %s \t found!"																						"${g}" "${reset}"
+		printf "%s √ %sfound!"			"${g}" "${reset}"
 	else
-		printf "%s X %s\t NOT FOUND...but required!  Quitting..."														"${r}" "${reset}"
+		printf "%s X %s\t NOT FOUND...but required!  Quitting..."	"${r}" "${reset}"
 		exit 2
 	fi
 
 	printf "\n\n\t %s=========================================================================================="		"${b}"
-	printf "  \n\t ==  Building image..."
+	printf "  \n\t = Building image..."
 	printf "  \n\t ==========================================================================================%s"		"${reset}"
 	printf "\n\n"
 
@@ -25,9 +25,9 @@
 								--pull											\
 								--build-arg TARGET_PREFIX="${target_prefix}"	\
 								--build-arg SERVICE_NAME="${service_name}"		\
-								--build-arg TARGET_DOMAIN="${target_domain}"	\
 								--build-arg IMAGE_TAG="${image_tag}"			\
-								--build-arg LOG_LEVEL="${log_level}"			\
+#								--build-arg TARGET_DOMAIN="${target_domain}"	\
+#								--build-arg LOG_LEVEL="${log_level}"			\
 								"${service_name}"								\
 	; then
 		printf "\n\n\t %s!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"				"${b}"
@@ -42,7 +42,7 @@
 
 
 	printf "\n\n\t\t %s============================================================================================"	"${b}"
-	printf "  \n\t\t ==  Pushing new image to remote registry: %s/%s/%s:%s"												"${cloud_project_id}" "${service_name}"		"${target_prefix}" "${IMAGE_TAG}"
+	printf "  \n\t\t = Pushing new image to remote registry: %s/%s/%s:%s"												"${cloud_project_id}" "${service_name}"		"${target_prefix}" "${IMAGE_TAG}"
 	printf "  \n\t\t ============================================================================================%s"	"${reset}"
 	printf "\n\n"
 

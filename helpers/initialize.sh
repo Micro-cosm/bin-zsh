@@ -63,17 +63,16 @@ export six_in
 export default_cloud_pipeline_json;
 export script_prefix;
 
-printf "%s\n"								"${grey}"
-printf "=%.0s"								{0..108}
-printf "\n==  FLEX DEPLOY:  Start\n"
-printf '=%.0s'								{0..108}
+printf "%b%s"					"${two_down}"  "${grey}"
+printf "=%.0s"					{0..108}
+printf "\n= FLEX DEPLOY: Start\n"
+printf '=%.0s'					{0..108}
 
-printf "\n\t"
-printf "=%.0s"								{0..100}
-printf "\n\t==  ENVIRONMENT\n\t"			"${four_in}"
-printf "=%.0s"								{0..100}
-printf "\n"
-printf "%bLoading project-wide defaults:"	"${two_in} "
+printf "%b"						"\n\t"
+printf "=%.0s"					{0..100}
+printf "%b= ENVIRONMENT%b"		"\n\t"  "\n\t"
+printf "=%.0s"					{0..100}
+printf "%bProject defaults:"	"${two_down}${two_in}"
 
 . "${fd_init}"
 
@@ -86,9 +85,9 @@ fi
 
 export fd_rc_script="${PWD}/.fd.${target_domain}"
 
-printf "%s%b"								"${y}"  "\n${two_in}"
-printf "=%.0s"								{0..92}
-printf "%b==  ENVIRONMENT:  Initialize%b"	"\n${two_in}"  "\n${two_in}"
-printf "=%.0s"								{0..92}
+printf "%s%b"						"${y}"  "\n${two_in}"
+printf "=%.0s"						{0..92}
+printf "%b= ENVIRONMENT: Init%b"	"\n${two_in}"  "\n${two_in}"
+printf "=%.0s"						{0..92}
 
 . "${fd_rc_script}"

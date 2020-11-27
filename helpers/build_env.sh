@@ -1,3 +1,5 @@
+#!/bin/zsh
+
 if [[ "${TARGET_PREFIX}" ]]; then
     target_prefix="${(L)TARGET_PREFIX}"
 else

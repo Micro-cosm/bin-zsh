@@ -29,7 +29,7 @@ else
 fi
 
 printf '=%.0s'											{0..108}
-printf "\n==  FLEX DEPLOY:  End%bReturn Code:  %s\n"	"${five_in}${four_in}"  "${deploy_return_code}"
+printf "\n= FLEX DEPLOY:  End%bReturn Code:  %s\n"	"${five_in}${four_in}"  "${deploy_return_code}"
 printf '=%.0s'											{0..108}
 printf "%s\n"											"${reset}"
 
