@@ -1,7 +1,6 @@
 
 # ignoring all go stuff and templates for now
 *go
-go*
 
 templates
 
