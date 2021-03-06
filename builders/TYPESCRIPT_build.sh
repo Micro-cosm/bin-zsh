@@ -1,9 +1,11 @@
 #!/bin/zsh
 
 manifest='package.json'
-
-printf "%bBuild requested:%b%s"					"\n${three_in}"  "${four_in}"  "${g}${target_prefix}${reset}"
-printf "%bLooking for a known manifest ..."		"\n${four_in}"
+printf "%s\nBuild requested: "					"${y}"
+printf " %.0s"	{0..18}
+printf "%s%s"									"${reset}"	"${target_alias}${reset}"
+printf "%s\n  Looking for a known manifest "	"${y}"
+printf ".%.0s"	{0..2}
 if [[ -e "${manifest}" ]]; then
 	printf "%s √ %sfound %s" 					"${g}" "${reset}"  "${manifest}"
 else
@@ -11,21 +13,24 @@ else
 	exit 2
 fi
 if [[ "${target}" == 'LOCAL' ]]; then
-	printf "%bLooking for 'dist'ination ......"	"\n${four_in}"
+	printf "%s\nLooking for 'dist'ination "		"${y}"
+	printf ".%.0s"	{0..8}
 
 	if [[ -d "./dist" ]]; then
 		printf "%s √ %sfound './dist'"			"${g}" "${reset}"
 	else
-		printf "%s X %sNOT FOUND...creating './dist/'"		"${r}" "${reset}"
+		printf "%s X NOT FOUND..."				"${r}"
+		printf "%s creating %s'./dist/'"		"${y}"	"${reset}"
 		mkdir dist
 		chmod -R 777 dist
 		printf "done"
 	fi
 fi
 
-printf "%s%bSTARTING TYPESCRIPT LOCAL BUILD...%b%s"			"${y}"  "${two_down}${three_in}"  "\n"  "${reset}"
-if ! npm run "build:${target_prefix}"; then
+printf "%s\n\nSTARTING TYPESCRIPT LOCAL BUILD...%s"	"${y}"	"${reset}"
+if ! npm run "build:${target_alias}"; then
 
-		npm run "build:ngssc:local" 2>>./.fd.error.log;
+		npm run "build:ngssc:local";
+
 fi
-printf "%s%bDONE.%s"										"${g}"  "${three_in}"  "${reset}"
+printf "%sDONE%s"  "${g}"  "${reset}"

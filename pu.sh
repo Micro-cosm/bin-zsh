@@ -12,15 +12,9 @@ read -r -d "${usage_message}" << EOM
 	Usage: pu.sh <[--local|-l] | [--remote|-r]> (--nobuild|-nb) (--nopull|-np)  (--help|-h)
 EOM
 
-
-
 . "${HELPERS}/initialize.sh"
-
 . "${HELPERS}/build.sh"
-
 . "${HELPERS}/deploy.sh"
-
-
 
 if [[ ${deploy_return_code} -gt 0 ]]; then
 	printf "%s\n"  	"${r}"
@@ -28,9 +22,8 @@ else
 	printf "%s\n"  	"${g}"
 fi
 
-printf '=%.0s'											{0..108}
-printf "\n= FLEX DEPLOY:  End%bReturn Code:  %s\n"	"${five_in}${four_in}"  "${deploy_return_code}"
-printf '=%.0s'											{0..108}
-printf "%s\n"											"${reset}"
+printf '=%.0s'  {0..108}
+printf "\nFLEX DEPLOY:  End%bReturn Code:  %s\n"  "${five_in}${four_in}"  "${deploy_return_code}"
+printf "%s\n\n"  "${reset}"
 
 exit ${deploy_return_code}

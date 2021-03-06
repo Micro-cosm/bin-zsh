@@ -1,44 +1,54 @@
 #!/bin/zsh
 
 manifest='package.json'
-
-printf "%bBuild requested:%b%s"						"\n${three_in}"  "${three_in}"  "${g}${target_prefix}${reset}"
-printf "%bLooking for '%s'......"					"\n${four_in}"   "${manifest}"
-
+printf "%s\nBuild requested by: %s"  					"${y}"	"${reset}"
+printf " %.0s"	{0..16}
+printf "%s"												"${target_alias}"
+printf "%s\nLooking for '%s' "							"${y}"	"${manifest}"
+printf ".%.0s"	{0..6}
 if [[ -e "${manifest}" ]]; then
-	printf "%s √ %sfound!"							"${g}"  "${reset}"
+	printf "%s √ %sfound!"								"${g}"  "${reset}"
 else
-	printf "%s X %sNOT FOUND, quitting"				"${r}" "${reset}"
+	printf "%s X %sNOT FOUND, quitting"					"${r}"	"${reset}"
 	exit 2
 fi
-
 if [[ "${target}" == 'LOCAL' ]]; then
-	printf "%bLooking for a 'dist'ination....."		"\n${four_in}"
-
+	printf "%s\nLooking for 'dist'ination "				"${y}"
+	printf ".%.0s"	{0..7}
 	if [[ -d "./dist" ]]; then
-		printf "%s √ %sfound './dist'!"				"${g}"  "${reset}"
+		printf "%s √ %sfound './dist'!"					"${g}"	"${reset}"
 	else
-		printf "%s X %sNONE, creating './dist'..."	"${r}" "${reset}"
+		printf "%s X %sNONE, creating './dist'..."		"${r}"	"${reset}"
 		mkdir dist
 		chmod -R 777 dist
 		printf "done"
 	fi
 fi
 
-printf "%s%bSTARTING ANGULAR LOCAL BUILD...%b%s"	"${y}"  "${two_down}${three_in}"  "${two_down}"  "${reset}"
+printf "%s\nSTARTING ANGULAR BUILD, using: %s"		"${y}"	"${reset}"
+printf " %.0s"	{0..5}
+printf "%s%s\n"										"build:ngssc:${target_alias}"
+printf " %.0s"	{0..24}
+printf "%sfrom:%s"									"${y}"	"${reset}"
+printf " %.0s"	{0..6}
+printf "%s\n"										"${manifest}"
 
-if ! npm run "build:ngssc:${target_prefix}"; then
-	if ! npm run build -- --configuration="${target_prefix}" 2>>./.fd.error.log; then
-		printf "%s\n\t A default configuration was used, '%s' was not defined in angular.json"		"${y}"  "${target_prefix}"
-		printf "  \n\t You might give this a read to avoid this bit of ugliness in future builds:"
-		printf "\n\n\t\t https://angular.io/guide/workspace-config"
-		printf "\n\n%s"	"${reset}"
+if ! npm run "build:ngssc:${target_alias}"	>>/dev/null; then
 
-		npm run "build:ngssc:local" 2>>./.fd.error.log;
+	printf "%sb!!!!! no build:ngssc:%s was found  !!!!!%b%s"	"${r}"	"${two_down}"	"${target_alias}"	"${two_down}"	"${reset}"
+
+	if ! npm run build -- --configuration="${target_alias}"; then
+
+		printf "%sb!!!!! no build -- --configuration=%s was found !!!!!%b%s"			"${r}"	"${two_down}"	"${target_alias}"	"${two_down}"
+		printf "%s\n Using default configuration -- '%s' undefined in angular.json"		"${y}"	"${target_alias}"
+		printf "  \n You might give this a read to avoid this bit of ugliness in future builds:"
+		printf "\n\n https://angular.io/guide/workspace-config"
+		printf "\n\n%s"			"${reset}"
+
+		npm run "build:ngssc:local";
+
 	fi
 fi
 
-printf "%s%bDONE.%s"	"${g}"  "\n${three_in}"  "${reset}"
-date
-# du -hs * | sort -hr
 du -hs dist | sort -hr
+printf "%sDONE%s"				"${g}"  "${reset}"

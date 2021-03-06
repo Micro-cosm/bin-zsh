@@ -2,41 +2,42 @@
 
 manifest='docker-compose.yml';
 
-printf "%bBuild requested:%b%s" "\n${three_in}"  "${four_in}"  "${g}${target_prefix}${reset}"
-printf "%bLooking for '%s'......"	"\n${four_in}"  "${manifest}"
-
-
+printf "%s\nBuild requested by:%s"  			"${y}"	"${reset}"
+printf " %.0s"	{0..18}
+printf "%s"										"${target_alias}"
+printf "%s\nLooking for '%s' "					"${y}"	"${manifest}"
+printf " %.0s"	{0..1}
 if [[ -e "${manifest}" ]]; then
-	printf "%s √ %sfound!"  				"${g}"  "${reset}"
+	printf "%s √ %sfound!"  					"${g}"  "${reset}"
 else
-	printf "%s X %sNOT FOUND, quitting%b"	"${r}"  "${reset}"  "${three_down}"
+	printf "%s X %sNOT FOUND, quitting...%b"	"${r}"  "${reset}"  	"${three_down}"
 	exit 2
 fi
-
-printf "%s%bSTARTING DOCKER BUILD...%b%s"	"${y}"  "${two_down}${three_in}"  "${two_down}"  "${reset}"
-
-if ! docker-compose build	--no-cache											\
-							--progress auto										\
-							--pull												\
-							--build-arg CLOUD_PROJECT_ID="${cloud_project_id}"	\
-							--build-arg TARGET_PREFIX="${target_prefix}"		\
-							--build-arg SERVICE_NAME="${service_name}"			\
-							--build-arg IMAGE_TAG="${image_tag}"				\
-#							--build-arg TARGET_DOMAIN="${target_domain}"		\
-#							--build-arg LOG_LEVEL="${log_level}"				\
-							"${service_name}"									\
-; then
-	printf "%s%b"										"${r}"  "${two_down}\t"
-	printf "!%.0s"										{24..120}
-	printf "\n\t!!  Dockerfile issues encountered\n\t"
-	printf "!%.0s"										{24..120}
-	printf "%bRun following command for details:"		"${two_down}\t"
-	printf "%b"											"${two_down}"  "${three_in}"
-
-	printf "TARGET_DOMAIN=%s TARGET_PREFIX=%s IMAGE_TAG=%s LOG_LEVEL=%s SERVICE_NAME=%s CLOUD_PROJECT_ID=%s docker-compose build %s"  "${target_domain}"  "${target_prefix}"  "${image_tag}"  "${log_level}"  "${service_name}"  "${cloud_project_id}"  "${service_name}"
+printf "%s\nBUILDING IMAGE, using:"				"${y}"
+printf "%b   $%s  TARGET_DOMAIN=%s  "			"\n"	"${bgb}${w}"	"${target_domain}"
+printf "TARGET_ALIAS=%s  "						"${target_alias}"
+printf "TARGET_IMAGE_TAG=%s  "					"${target_image_tag}"
+printf "LOG_LEVEL=%s  "  						"${log_level}"
+printf "SERVICE_NAME=%s  "						"${service_name}"
+printf "TARGET_PROJECT_ID=%s  "					"${target_project_id}"
+printf "docker-compose build %s  "				"${service_name}"
 
 
-	printf "\n\n\n...quitting\n\n%s"					"${reset}"
-	exit 4
-fi
-printf "%s%bDONE.%s"									"${g}"  "\n${three_in}"  "${reset}"
+docker-compose build	--no-cache  --progress auto	 --pull						\
+						--build-arg TARGET_PROJECT_ID="${target_project_id}"	\
+						--build-arg TARGET_ALIAS="${target_alias}"				\
+						--build-arg SERVICE_NAME="${service_name}"				\
+						--build-arg TARGET_IMAGE_TAG="${target_image_tag}"		\
+						"${service_name}"  >>/dev/null  2>&1  &
+
+this_pid=$!;
+this_spinner='-\|/';
+i=0;
+printf "%s"										"${reset}${y}";
+while kill -0 "${this_pid}" 2>/dev/null; do
+	i=$(( (i+1) %4 ));
+	printf "\r %s "								"${this_spinner:$i:1}"
+	sleep .2;
+done
+printf "%s\n"									"${reset}"
+printf "%sDONE%s"								"${g}"	"${reset}"

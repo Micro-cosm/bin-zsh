@@ -1,10 +1,10 @@
 #!/bin/zsh
 
-if [[ "${TARGET_PREFIX}" ]]; then
-    target_prefix="${(L)TARGET_PREFIX}"
+if [[ "${TARGET_ALIAS}" ]]; then
+    target_alias="${(L)TARGET_ALIAS}"
 else
-   target_prefix="${(L)FD_TARGET_PREFIX}"
-    export TARGET_PREFIX="${target_prefix}"
+   target_alias="${(L)FD_TARGET_ALIAS}"
+    export TARGET_ALIAS="${target_alias}"
 fi
 if [[ "${PORT}" ]]; then
     target_port="${PORT}"
@@ -14,11 +14,11 @@ else
     export PORT="${target_port}"
     export TARGET_PORT="${target_port}"
 fi
-if [[ "${IMAGE_TAG}" ]]; then
-    image_tag="${IMAGE_TAG}"
+if [[ "${TARGET_IMAGE_TAG}" ]]; then
+    target_image_tag="${TARGET_IMAGE_TAG}"
 else
-    image_tag="${(L)FD_IMAGE_TAG}"
-    export IMAGE_TAG="${image_tag}"
+    target_image_tag="${(L)FD_TARGET_IMAGE_TAG}"
+    export TARGET_IMAGE_TAG="${target_image_tag}"
 fi
 if [[ "${LOG_LEVEL}" ]]; then
     # log_level="${(U)LOG_LEVEL}"
@@ -27,11 +27,11 @@ else
     log_level="${(U)FD_LOG_LEVEL}"
     export LOG_LEVEL="${log_level}"
 fi
-if [[ "${CLOUD_PROJECT_ID}" ]]; then
-    cloud_project_id="${(L)CLOUD_PROJECT_ID}"
+if [[ "${TARGET_PROJECT_ID}" ]]; then
+    target_project_id="${(L)TARGET_PROJECT_ID}"
 else
-    cloud_project_id="${(L)FD_CLOUD_PROJECT_ID}"
-    export CLOUD_PROJECT_ID="${cloud_project_id}"
+    target_project_id="${(L)FD_TARGET_PROJECT_ID}"
+    export TARGET_PROJECT_ID="${target_project_id}"
 fi
 if [[ "${SERVICE_NAME}" ]]; then
     service_name="${(L)SERVICE_NAME}"
@@ -45,88 +45,78 @@ else
     target="${(U)FD_TARGET}"
     export TARGET="${target}"
 fi
-if [[ "${TARGET_TYPE}" ]]; then
-    target_type="${(U)TARGET_TYPE}"
+if [[ "${BUILD_CONTEXT}" ]]; then
+    build_context="${(U)BUILD_CONTEXT}"
 else
-    target_type="${(U)FD_TARGET_TYPE}"
-    export TARGET_TYPE="${target_type}"
+    build_context="${(U)FD_BUILD_CONTEXT}"
+    export BUILD_CONTEXT="${build_context}"
 fi
 
-
-printf "%bLooking for a target prefix ............"		"\n${three_in}"
-if [[ "${target_prefix}" ]]; then
-	printf "%s √ %s%s"									"${g}"  "${reset}"  "${target_prefix}"
+printf "%s\nLooking for a target alias "			"${y}"
+printf ".%.0s"  {0..6}
+if [[ "${target_alias}" ]]; then
+	printf "%s √ %s%s"								"${g}"  "${reset}"  "${target_alias}"
 else
-	target_prefix="dev"
-	printf "%s X %s\tNONE FOUND... default:\t%s"		"${r}"	"${reset}"	"${target_prefix}"
+	target_alias="dev"
+	printf "%s X %s\tNONE FOUND... default:\t%s"	"${r}"	"${reset}"	"${target_alias}"
 fi
 
-
-printf "%s%bLooking for required arguments ........."	"${reset}" "\n${three_in}"
-
-
+printf "%s\nLooking for required arguments "		"${y}"
+printf ".%.0s"  {0..2}
 if [[ ! $# -gt 0 ]]; then
-    printf "%s \t X %s\trequired...quitting%b"			"${r}" "${reset}"  "${two_down}"
-    printf "%b%s%b"										"${two_down}"  "\t${usage_message}"  "${two_down}"
-
+    printf "%s \t X %s\trequired...quitting%b"		"${r}" "${reset}"  "${two_down}"
+    printf "%b%s%b"									"${two_down}"  "\t${usage_message}"  "${two_down}"
     exit 1
 else
-
-    printf "%s √ %sfound!"								"${g}"  "${reset}"
-
+    printf "%s √ %sfound!"							"${g}"  "${reset}"
     while [[ $# -gt 0 ]]; do
-
-        printf "%bConsume next ..................."		"\n${four_in}"
+        printf "%s\n  Consume next "				"${y}"
+		printf ".%.0s"  {0..18}
         case "$1" in
             --local | -l | -local)
-                printf "%s √ %s--local"			"${g}"  "${reset}"
+                printf "%s √ %s--local"				"${g}"  "${reset}"
                 target='LOCAL'
                 export TARGET="${target}"
             ;;
             --remote=* | -r=* | -remote )
-                target_prefix="${(L)1#*=}"
+                target_alias="${(L)1#*=}"
                 target='REMOTE'
-                export TARGET_PREFIX="${target_prefix}"
-                printf "%s √ %s--remote"	"${g}"  "${reset}"
+                export TARGET_ALIAS="${target_alias}"
+                printf "%s √ %s--remote"				"${g}"  "${reset}"
                 export TARGET="${target}"
            ;;
             --nobuild | -nb)
                 local_build=false
-                printf "%s √ %s--nobuild"	"${g}"  "${reset}"
+                printf "%s √ %s--nobuild"				"${g}"  "${reset}"
             ;;
             --nodocker | -nd)
                 docker_build=false
-                printf "%s √ %s--nodocker"	"${g}"  "${reset}"
+                printf "%s √ %s--nodocker"				"${g}"  "${reset}"
             ;;
             --nopull | -npll)
                 pull=false
-                printf "%s √ %s--nopull"	"${g}"  "${reset}"
+                printf "%s √ %s--nopull"				"${g}"  "${reset}"
             ;;
             --nopush | -npsh)
                 push=false
-                printf "%s √ %s--nopush"	"${g}"  "${reset}"
+                printf "%s √ %s--nopush"				"${g}"  "${reset}"
             ;;
-
             --service_name=* | -s=* )
-                service_name="${1#*=}"
+       			service_name="${(L)1#*=}"
                 export SERVICE_NAME="${service_name}"
                 printf "%s √ %s--service_name=%s"		"${g}"  "${reset}"  "${service_name}"
             ;;
-
 			--target_domain=* | -td=* )
 				export TARGET_DOMAIN="${1#*=}"
 				printf "%s √ %s--target_domain=%s"		"${g}"  "${reset}"  "${TARGET_DOMAIN}"
 			;;
-
             \? | --help | -h)
                 printf "%s √ %s--help\tquitting" 		"${g}"  "${reset}"
                 printf "%b%s%s%s%b" 					"${three_down}"  "${b}"  "${usage_message}"  "${reset}"  "${two_down}"
-
                 exit 0
             ;;
-
            *)
-               printf "%s X %s\t'%s' unknown...continue(Y|n)?"	"${r}"  "${reset}"  "${1}"
+               printf "%s X %s '%s' unknown...continue(Y|n)?"	"${r}"  "${reset}"  "${1}"
                read -r
            ;;
         esac
@@ -134,4 +124,4 @@ else
     done
 fi
 
-printf "%s%bDONE.%s"	"${g}"  "\n${three_in}"  "${reset}"
+printf "%s\nDONE%s"		"${g}"	"${reset}"

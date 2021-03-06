@@ -1,14 +1,20 @@
 
+# ignoring all go stuff and templates for now
+*go
+go*
+
+templates
 
 .ARCHIVE
 *.NEW
 *.SAVE
 
+.idea
+
 cloudbuild*
 env
 *.wio
 **/secrets
-.idea
 **/__pycache__
 **/.DS_Store
 *swp
@@ -16,5 +22,3 @@ lib/
 **/*.pyc
 
 
-# ignoring all go stuff for now
-go
