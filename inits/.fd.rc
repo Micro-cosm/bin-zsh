@@ -1,0 +1,7 @@
+#!/bin/zsh
+###  Microservice Project-wide Defaults
+export FD_TARGET_DOMAIN='weja.us'
+
+printf "%s\nTARGET_DOMAIN "	"${y}"
+printf ".%.0s"				{0..19}
+printf "%s √ %s%s"  		"${g}"  "${reset}"  "${(L)FD_TARGET_DOMAIN}"

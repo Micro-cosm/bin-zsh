@@ -1,32 +1,5 @@
 #!/bin/zsh
 
-declare fd_init;
-declare fd_deploy_rc_script;
-declare b;
-declare g;
-declare o;
-declare r;
-declare y;
-declare w;
-declare bgw;
-declare grey;
-declare reset;
-declare two_down
-declare two_in
-declare three_in
-declare four_in
-declare five_in
-declare six_in
-declare default_cloud_pipeline_json;
-declare deploy_return_code;
-declare script_prefix;
-declare target_image_tag;
-declare log_level;
-declare service_name;
-declare target;
-declare target_domain;
-declare build_context;
-
 script_prefix='docker'
 fd_init="${PWD}/.fd.rc"
 default_cloud_pipeline_json="${PWD}/cloudbuild.json"
@@ -37,6 +10,7 @@ three_in='\t\t\t';
 four_in='\t\t\t\t';
 five_in='\t\t\t\t\t';
 six_in='\t\t\t\t\t\t';
+seven_in='\t\t\t\t\t\t\t';
 
 autoload colors;
 colors;
@@ -68,9 +42,9 @@ export three_in;
 export four_in;
 export five_in;
 export six_in;
+export seven_in;
 export default_cloud_pipeline_json;
 export script_prefix;
-
 
 # echo -e "\e]8;;http://example.com\a This is a link \e]8;;\a"  														### Trying to get a clickable link capable of cut/paste commands
 
@@ -80,13 +54,11 @@ printf '=%.0s'							{0..80}
 printf "\n= ENVIRONMENT %b%s"			"${six_in}"	"${fd_init}";
 if [[ -r "${fd_init}" ]]; then
 
-
 	. "${fd_init}"
-
 
 else
 	printf "\n\t";
-	printf "%s%b!!!  %s NOT FOUND or lacks read permission  !!!  Quitting...%b"	"${r}"	"${two_down}"	"${fd_init}"	"${two_down}"
+	printf "%s%b%s NOT FOUND or lacks read permission, quitting...%b"	"${r}"	"${two_down}"	"${fd_init}"	"${two_down}"
 	printf "\n%s" 	"${reset}";
 	exit 1;
 fi
@@ -100,9 +72,7 @@ export fd_rc_script="${PWD}/.fd.${target_domain}"
 printf "%s\n==  ENVIRONMENT: Init %b%s"  "${b}"		"${five_in}"	"${fd_rc_script}"
 if [[ -r "${fd_rc_script}" ]]; then
 
-
 	. "${fd_rc_script}"
-
 
 else
 	printf "%b"  "${two_down}";

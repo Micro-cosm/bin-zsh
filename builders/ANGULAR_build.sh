@@ -33,22 +33,20 @@ printf "%sfrom:%s"									"${y}"	"${reset}"
 printf " %.0s"	{0..6}
 printf "%s\n"										"${manifest}"
 
-if ! npm run "build:ngssc:${target_alias}"	>>/dev/null; then
+if ! npm run build:ngssc:${target_alias}  >>/dev/null; then
+	printf "'build:ngssc:%s'%s\tfinished with ERROR using: %s%s%s\t...strike one!%s\n"					"${target_alias}"	"${r}"	"${reset}"	"${manifest}"	"${r}"	"${reset}"
 
-	printf "%sb!!!!! no build:ngssc:%s was found  !!!!!%b%s"	"${r}"	"${two_down}"	"${target_alias}"	"${two_down}"	"${reset}"
+	if ! npm run build -- --configuration=${target_alias}  >>/dev/null; then
+		printf "'configuration=%s'%s\tfinished with ERROR using: %s%s%s\t...strike two!%s\n"			"${target_alias}"	"${r}"	"${reset}"	"angular.json"	"${r}"	"${reset}"
 
-	if ! npm run build -- --configuration="${target_alias}"; then
-
-		printf "%sb!!!!! no build -- --configuration=%s was found !!!!!%b%s"			"${r}"	"${two_down}"	"${target_alias}"	"${two_down}"
-		printf "%s\n Using default configuration -- '%s' undefined in angular.json"		"${y}"	"${target_alias}"
-		printf "  \n You might give this a read to avoid this bit of ugliness in future builds:"
-		printf "\n\n https://angular.io/guide/workspace-config"
-		printf "\n\n%s"			"${reset}"
-
-		npm run "build:ngssc:local";
-
+		if ! npm run build:ngssc:local  >>/dev/null; then
+			printf "'build:ngssc:local'%s\tfinished with ERROR using: %s%s%s\t...strike three!%s\n"		"${r}"	"${reset}"	"${manifest}"	"${r}"
+			printf "Yer out...%s%b"		"${reset}"	"${two_down}"
+			exit 1
+		fi
 	fi
 fi
 
 du -hs dist | sort -hr
-printf "%sDONE%s"				"${g}"  "${reset}"
+
+printf "%sDONE%s"	"${g}"  "${reset}"

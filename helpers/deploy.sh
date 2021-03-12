@@ -26,7 +26,7 @@ if [[ "${target}" == "REMOTE" ]]; then
 		printf "%s √ %s%s%b"						"${g}"  "${reset}"  "${target_project_id}"
 		printf "%s\n  Build file "					"${y}"
 		printf ".%.0s"	{0..18}
-		printf "%s √ %s(valid/accessible)%b"		"${g}"  "${reset}"  "${two_down}"
+		printf "%s √ %s(valid/accessible)"			"${g}"  "${reset}"
 	else
 		printf "%s X %s required: %s... quitting"	"${r}"  "${reset}"  "${target_project_id}"
 		printf "%b"									"${two_down}"
@@ -35,71 +35,45 @@ if [[ "${target}" == "REMOTE" ]]; then
 fi
 
 
-if [[ "${target}" == "LOCAL" ]]; then
-
+if [[ "${target}" == "LOCAL" || "${target}" == "local" ]]; then
 	printf "%s\n= DEPLOY:  Pull image %b%s"				"${b}"	"${five_in}"	"${HELPERS}/deploy.sh"
 	printf "%s\nPull registry: %s"						"${y}"	"${reset}"
 	printf " %.0s"	{0..19}
 	printf "%s/%s/%s:%s"								"${target_project_id}"	"${service_name}"	"${target_alias}"	"${target_image_tag}"
 	if [[ "${pull}" == true ]]; then
 		printf "%s\nPULLING IMAGE, using:"				"${y}"
-		printf "%b   $%s  docker-compose pull %s  "	"\n"	"${w}${bgb}"	"${service_name}"
-
+		printf "%b   $%s  docker-compose pull %s  "		"\n"	"${w}${bgb}"	"${service_name}"
 
 		docker-compose pull "${service_name}" >>/dev/null 2>&1  &
-
-		deploy_return_code=$?;
-		this_pid=$!;
-		this_spinner='-\|/';
-		i=0;
-		printf "%s"									"${reset}${y}";
-		while kill -0 "${this_pid}" 2>/dev/null; do
-			i=$(( (i+1) %4 ));
-			printf "\r %s "							"${this_spinner:$i:1}"
-			sleep .2;
-		done
-		printf "%s\n"								"${reset}";
-		printf "%sDONE%s"							"${g}"	"${reset}";
+		. "${HELPERS}/spinner.sh" $!
 
 	else
-		printf "%s\n%b"								"${y}"	"${three_in}"
+		printf "%s\n%b"										"${y}"	"${three_in}"
 		printf '!%.0s'	{24..108}
-		printf "%b!!  DEPLOY:  Pull skipped%b"		"\n${three_in}"  "\n${three_in}"
+		printf "%b!!  DEPLOY:  Pull skipped%b"				"\n${three_in}"  "\n${three_in}"
 		printf '!%.0s'	{24..108}
 		printf "%s"											"${reset}"
 	fi
 	printf "%s\n==  DEPLOY:  Stop container(s)"				"${b}"
-	printf "%s\nSTOPPING CONTAINERS...%s"					"${y}" "${reset}"
-	if ! docker-compose stop "${service_name}" && printf "\nstop=%s" "$?" && docker-compose rm --force "${service_name}" && printf "\nremove=%s" "$?"; then
-		printf "  \n %b Nothing to stop"					"${two_in}"
-	fi
-	printf "%sDONE%s"										"${g}"  "${reset}"
+	printf "%s\nSTOPPING CONTAINERS, using:"				"${y}"
+	printf "\n   $%s  docker-compose stop %s &&  "			"${w}${bgb}"	"${service_name}"
+	printf "docker-compose rm --force %s"					"${service_name}"
+
+	docker-compose stop "${service_name}"  >> /dev/null 2>&1  &&  docker-compose rm --force "${service_name}"  >> /dev/null 2>&1  &
+	. "${HELPERS}/spinner.sh" $!
+
 	printf "%s\n==  DEPLOY:  Start container(s) %b%s"		"${b}"	"${three_in}"	"${HELPERS}/deploy.sh"
 	printf "%s\nSTARTING CONTAINERS, using:"				"${y}"
-	printf "%b   $%s  docker-compose --log-level %s up "	"\n"	"${w}${bgb}"	"${log_level}"
+	printf "\n   $%s  docker-compose --log-level %s up "	"${w}${bgb}"	"${target_log_level}"
 	printf "--detach --force-recreate %s  "					"${service_name}"
 
-
-	docker-compose --log-level "${log_level}" up --detach --force-recreate "${service_name}"  >>/dev/null  2>&1  &	# log levels: DEBUG, INFO, WARNING, ERROR, CRITICAL (default: INFO)
-
-	deploy_return_code=$?;
-	this_pid=$!;
-	this_spinner='-\|/';
-	i=0;
-	printf "%s"											"${reset}${y}";
-	while kill -0 "${this_pid}" 2>/dev/null; do
-		i=$(( (i+1) %4 ));
-		printf "\r %s "									"${this_spinner:$i:1}"
-		sleep .2;
-	done
-	printf "%s\n"										"${reset}";
-	printf "%sDONE%s"									"${g}"	"${reset}";
+	docker-compose --log-level "${target_log_level}" up --detach --force-recreate "${service_name}"  >>/dev/null 2>&1  &
+	. "${HELPERS}/spinner.sh" $!
 
 else
-
 	cloud_region_actual=$(gcloud config get-value compute/region	2>/dev/null);
 	target_project_id_actual=$(gcloud config get-value project		2>/dev/null);
-	printf "%s==  DEPLOY:  Start container(s) %b%s"		"${b}"	"${three_in}"	"${HELPERS}/deploy.sh"
+	printf "\n%s==  DEPLOY:  Start container(s) %b%s"		"${b}"	"${three_in}"	"${HELPERS}/deploy.sh"
 	printf "%s\nCloud project(actual) "					"${y}"
 	printf ".%.0s"	{0..9}
 	printf "%s √ %s"									"${g}"	"${reset}${target_project_id_actual}"
@@ -127,6 +101,7 @@ else
 	cb_domain="cloudbuild.${target_domain}.${target_alias}.json"
 	cb_target="cloudbuild.${target_alias}.json"
 	cb_default="cloudbuild.json"
+
 	if [[ -e "${cb_service}" ]]; then
 		deploy_pipeline="${cb_service}"
 		printf "%s X %soverride found!\n%s"			"${r}"  "${y}"
@@ -155,8 +130,8 @@ else
 	fi
 	printf "%s\nUsing: %s%s (shown below)\n"		"${y}"	"${reset}"	"${deploy_pipeline}"
 	cat "${deploy_pipeline}";
-	gcloud config configurations activate "${target_project_id}"	>>/dev/null;		# 2>&1
-	gcloud config list  											>>/dev/null;		# 2>&1
+	gcloud config configurations activate "${target_project_id}"	>>/dev/null;
+	gcloud config list  											>>/dev/null;
 	printf "%s\nSubmitting, using:"					"${y}"
 	printf "%b   $%s  gcloud builds submit "		"\n"	"${w}${bgb}"
 	printf "--config=%s  --substitutions "			"${deploy_pipeline}"
@@ -164,21 +139,8 @@ else
 	printf "_TARGET_IMAGE_TAG=%s  %s"				"${target_image_tag}"	"${reset}"
 
 
-	gcloud builds submit  --config="${deploy_pipeline}"  --substitutions											\
-		 _SERVICE_NAME="${service_name}",_TARGET_ALIAS="${target_alias}",_TARGET_IMAGE_TAG="${target_image_tag}"	\
-		>>/dev/null  2>&1  &;
-
-	deploy_return_code=$?;
-	this_pid=$!;
-	this_spinner='-\|/';
-	i=0;
-	printf "%s"										"${reset}${y}"
-	while kill -0 "${this_pid}" 2>/dev/null; do
-		i=$(( (i+1) %4 ));
-		printf "\r %s "								"${this_spinner:$i:1}"
-		sleep .2;
-	done
-	printf "%s\n"									"${reset}"
-	printf "%sDONE%s"								"${g}"	"${reset}"
-
+	gcloud builds submit  --config="${deploy_pipeline}"  --substitutions	\
+		 _NICKNAME="${nickname}",_SERVICE_NAME="${service_name}",_TARGET_ALIAS="${target_alias}",_TARGET_IMAGE_TAG="${target_image_tag}"	\
+	>/dev/null  2>&1  &;
+	. "${HELPERS}/spinner.sh" $!
 fi

@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+    micro-private:
+        image: us.gcr.io/${TARGET_PROJECT_ID}/${SERVICE_NAME}/${TARGET_ALIAS}:${TARGET_IMAGE_TAG}
+        build:
+            context: .
+            args:
+                - TARGET_ALIAS
+                - TARGET_IMAGE_TAG
+                - SERVICE_NAME
+                - TARGET_PROJECT_ID
+        container_name: micro_private_3_${TARGET_ALIAS}
+        restart: unless-stopped
+        env_file:
+            - ".env.local.yml"
+        ports:
+            - "4401:8080"

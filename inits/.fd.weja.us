@@ -1,0 +1,65 @@
+#!/bin/zsh
+
+###  Target Defaults - Update the FD_* vars to set your local defaults and will apply to all projects
+export FD_NICKNAME=''					# THE ONLY UNIQUE IDENTIFIER FOR YOUR MICROFRONTEND AND MUST EXIST AND BE UNIQUE TO THE REALM
+export FD_TARGET_LOCAL_PORT=''			# Can be any valid TCP port, but is best overridden locally by docker-compose and remotely by Cloud provider (Google default: 8080)
+export FD_TARGET_PROJECT_ID='weja-us'	# Designed for use with Google project IDs, but can accommodate any number of cloud providers
+export FD_BUILD_CONTEXT='ANGULAR'		# Defines which builder script to use, current support:
+								    	# 'DOCKER' -- image-based deployments(no code)
+								      	 # 'ANGULAR' -- expects strict adherence to Angular CLI best practices
+									      # 'GO' -- assumes latest GO module-based implementation
+									       # 'TYPESCRIPT' -- primarily intended for nodejs deployments
+									        # 'PYTHON' --
+export FD_SERVICE_NAME=$(basename "$PWD")	# Can be set to any, but assumes the current parent directory name, typically the project repository
+export FD_TARGET='local'					# ["local", "remote"]
+export FD_TARGET_ALIAS="${USER}"			# Any URL-friendly string e.g. [ "dev", "stage", "prod" ], although "prod" is always treated as such (default: system username)
+export FD_TARGET_IMAGE_TAG='latest'			# Follows Docker image naming standards.  Can be any, although "latest" is always treated as such
+export FD_TARGET_REMOTE_PORT='8080'			# Can be any valid TCP port, but is best overridden locally by docker-compose and remotely by Cloud provider (Google default: 8080)
+export FD_TARGET_REALM='foo'				# Any URL-friendly string, along with TARGET_DOMAIN will define the micro-fe realm
+export FD_TARGET_LOG_LEVEL='error'			# Docker standard log levels [ "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL" ] (default: INFO)
+
+
+### Screen candy
+printf "\n%sLoading default domain:%s"		"${y}"	"${reset}"
+printf " %.0s"								{0..13}
+printf ".fd.%s"								"${(L)TARGET_DOMAIN}${y}"
+
+printf "%s\n  SERVICE_NAME "				"${y}"
+printf ".%.0s"  							{0..18}
+printf "%s √ %s%s"	  						"${g}"	"${reset}"	"${(L)FD_SERVICE_NAME}"
+
+printf "%s\n  TARGET:%s "					"${y}"	"${reset}"
+printf " %.0s"								{0..26}
+printf "%s"									"${(U)FD_TARGET}"
+
+printf "%s\n    TARGET_ALIAS "				"${y}"
+printf ".%.0s"  							{0..16}
+printf "%s √ %s%s"							"${g}"	"${reset}"	"${(L)FD_TARGET_ALIAS}"
+
+printf "%s\n    TARGET_PROJECT_ID "			"${y}"
+printf ".%.0s"  							{0..11}
+printf "%s √ %s%s"							"${g}"	"${reset}"	"${(L)FD_TARGET_PROJECT_ID}"
+
+printf "%s\n    TARGET_IMAGE_TAG "			"${y}"
+printf ".%.0s"  							{0..12}
+printf "%s √ %s%s"							"${g}"	"${reset}"	"${(L)FD_TARGET_IMAGE_TAG}"
+
+printf "%s\n    TARGET_LOCAL_PORT "			"${y}"
+printf ".%.0s"  							{0..17}
+printf "%s √ %s%s"							"${g}"	"${reset}"	"${FD_TARGET_LOCAL_PORT}"
+
+printf "%s\n    TARGET_REMOTE_PORT "		"${y}"
+printf ".%.0s"  							{0..17}
+printf "%s √ %s%s"							"${g}"	"${reset}"	"${FD_TARGET_REMOTE_PORT}"
+
+printf "%s\n    TARGET_REALM "				"${y}"
+printf ".%.0s"  							{0..16}
+printf "%s √ %s%s"							"${g}"	"${reset}"	"${(L)FD_TARGET_REALM}"
+
+printf "%s\n  TARGET_LOG_LEVEL "			"${y}"
+printf ".%.0s"  							{0..21}
+printf "%s √ %s%s"  						"${g}"	"${reset}"	"${(U)FD_TARGET_LOG_LEVEL}"
+
+printf "%s\n  BUILD_CONTEXT "				"${y}"
+printf ".%.0s"  							{0..17}
+printf "%s √ %s%s"							"${g}"	"${reset}"	"${(U)FD_BUILD_CONTEXT}"
