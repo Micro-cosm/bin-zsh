@@ -4,7 +4,7 @@ A set of zsh scripts that standardize build and deployment across a growing list
 
 ----
 
-## Supported Environments
+## Currently Supported Environments
 
 **Build targets:**
 - Angular
@@ -14,7 +14,8 @@ A set of zsh scripts that standardize build and deployment across a growing list
 - Go
 
 **Deploy targets:**
-- Local/Remote Docker 
+- Local build target runner(in-memory w/ file watcher and hot reload) 
+- Docker(Local/Remote)
 - GCP
 
 ----
@@ -29,6 +30,18 @@ $  `cd bin-zsh && ln -s  ~/bin  .`
 
 $   `echo 'export PATH=~/bin:${PATH}' >> ~/.zshrc`
     
+----
+## Description
+
+This utility serves as a simplistic way to build/test/deploy any of the [Supported Environments](#envs) with a single command that uses 
+intelligent defaults based on the following factors(order of precedence):
+  1.  manual re-deployment environment variables(local IDE/remote GCP web UI/local gcloud)
+  1.  runtime environment deployment overrides(docker-compose.yml/GCP cloudbuild.json)
+  1.  command line argument overrides(`--TARGET_ALIAS=prod`)
+  1.  current environment variable overrides(`. ~/.zshrc`/`export TARGET_ALIAS=prod`)
+  1.  flex deployment runtime configuration file(`<PROJECT ROOT>/.fd && <PROJECT ROOT>/.fd.<DEPLOYMENT DOMAIN>`)
+  1.  intelligent defaults(script-based rules driven by the targeted language or targeted Docker image defaulting to local Docker deployment)
+
 
 ----
 
